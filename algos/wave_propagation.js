@@ -96,6 +96,10 @@ self.addEventListener("message", (e) => {
       for (let y_offset = -1; y_offset <= 1; y_offset++) {
           // offset (0, 0) is the cell itself, so ignore it
           if (x_offset === 0 && y_offset === 0) continue;
+          if (x_offset === 1 && y_offset === 1) continue;
+          if (x_offset === -1 && y_offset === -1) continue;
+          if (x_offset === 1 && y_offset === -1) continue;
+          if (x_offset === -1 && y_offset === 1) continue;
           if (x + x_offset >= 0 && x + x_offset < _ROWS
              && y + y_offset >= 0 && y + y_offset < _COLS) {
             result.push([x+x_offset, y+y_offset]);
@@ -114,7 +118,11 @@ self.addEventListener("message", (e) => {
     for (let x_offset = -1; x_offset <= 1; x_offset++) {
       for (let y_offset = -1; y_offset <= 1; y_offset++) {
           // offset (0, 0) is the cell itself, so ignore it
-          // if (x_offset === 0 && y_offset === 0) continue;
+          if (x_offset === 0 && y_offset === 0) continue;
+          if (x_offset === 1 && y_offset === 1) continue;
+          if (x_offset === -1 && y_offset === -1) continue;
+          if (x_offset === 1 && y_offset === -1) continue;
+          if (x_offset === -1 && y_offset === 1) continue;
           if (x + x_offset >= 0 && x + x_offset < _ROWS
              && y + y_offset >= 0 && y + y_offset < _COLS) {
             if (initialMaze[x+x_offset][y+y_offset] === 0) discoveredNodes.push([x+x_offset, y+y_offset]);
