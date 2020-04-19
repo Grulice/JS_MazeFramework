@@ -103,18 +103,28 @@ function resetMaze() {
     },
     cells: [],
     walls: [],
+    path: [],
     startCell: null,
     endCell: null,
     drawPath: function (pathArray) {
+      this.clearPath();
       for (let step of pathArray) {
         let targetCell = this.cells[step[0]][step[1]];
-        if (targetCell.cellType !== cellTypes.WALL) {
+        if (targetCell.cellType === cellTypes.EMPTY) {
           targetCell.changeCellTypeTo(cellTypes.PATH);
+          this.path.push(targetCell);
         } else {
-          console.error(
-            `Can't draw path at ${step[0]}, ${step[1]} because it's a wall.`
+          console.warn(
+            `Skipping path at ${step[0]}, ${step[1]} because it's not an empty cell.`
           );
         }
+      }
+    },
+    clearPath: function () {
+      let shifted = this.path.shift();
+      while (shifted) {
+        shifted.changeCellTypeTo(cellTypes.EMPTY);
+        shifted = this.path.shift();
       }
     },
     drawWall: function (pos) {
@@ -124,6 +134,15 @@ function resetMaze() {
       }
       if (targetCell.cellType === cellTypes.END) {
         this.endCell = null;
+      }
+      if (targetCell.cellType === cellTypes.PATH) {
+        this.path = this.path.filter(
+          (pathCell) =>
+            !(
+              pathCell.mazeRow === targetCell.mazeRow &&
+              pathCell.mazeCol === targetCell.mazeCol
+            )
+        );
       }
       targetCell.changeCellTypeTo(cellTypes.WALL);
       this.walls.push([targetCell.mazeRow, targetCell.mazeCol]);
@@ -155,7 +174,7 @@ function resetMaze() {
         }
         targetCell.changeCellTypeTo(cellTypes.EMPTY);
         maze.walls = maze.walls.filter(
-          (cell) => !(cell[0] === this.mazeRow && cell[1] === this.mazeCol)
+          (cell) => !(cell[0] === targetCell.mazeRow && cell[1] === targetCell.mazeCol)
         );
       }
     },
@@ -259,7 +278,7 @@ function handleFindPath() {
 }
 
 function findPathUsingScript(fileName) {
-  if(!fileName) return;
+  if (!fileName) return;
   let worker = new Worker(`./algos/${fileName}`);
 
   worker.addEventListener("message", (e) => {
@@ -273,7 +292,7 @@ function findPathUsingScript(fileName) {
   });
 
   const startPos = [maze.startCell.mazeRow, maze.startCell.mazeCol];
-  const endPos = [maze.endCell.mazeRow, maze.startCell.mazeCol];
+  const endPos = [maze.endCell.mazeRow, maze.endCell.mazeCol];
   execStartTime = Date.now();
   loadingPlaque.classList.remove("invisible");
   worker.postMessage({
