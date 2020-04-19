@@ -283,7 +283,7 @@ function findPathUsingScript(fileName) {
   });
 
   const startPos = [maze.startCell.mazeRow, maze.startCell.mazeCol];
-  const endPos = [maze.endCell.mazeRow, maze.startCell.mazeCol];
+  const endPos = [maze.endCell.mazeRow, maze.endCell.mazeCol];
   execStartTime = Date.now();
   loadingPlaque.classList.remove("invisible");
   worker.postMessage({
