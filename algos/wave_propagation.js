@@ -19,16 +19,18 @@ self.addEventListener("message", (e) => {
   
     // this function must return an array of coordinates of the path (similar to the walls)
     // Happy pathfinding! :)
+    _ROWS = mazeInfo.dimensions.rowNumber;
+    _COLS = mazeInfo.dimensions.colNumber;
+    _START = mazeInfo.start;
+    _END = mazeInfo.end;
+    _SCANNED_MAZE = [];
 
     let initialMaze = internalizeMaze(mazeInfo);
-    let scannedMaze = scanMaze(initialMaze, mazeInfo.start, mazeInfo.end);
-  
-    console.log(JSON.stringify(scannedMaze));
-    let result = [
-      [0, 0],
-      [0, 1],
-      [0, 2],
-    ];
+    _SCANNED_MAZE = scanMaze(initialMaze, mazeInfo.start, mazeInfo.end);
+
+    console.log(JSON.stringify(_SCANNED_MAZE));
+    
+    let result = buildPath();
     return result;
   }
 
@@ -45,59 +47,120 @@ self.addEventListener("message", (e) => {
       }
     }
 
-    for (let i = 0; i < walls.length; i++) {
-      let c_wall = walls[i];
-      maze[c_wall[0]][c_wall[1]] = -1;
-    }
+    walls.forEach(function(item) {
+      maze[item[0]][item[1]] = -1;
+    });
 
     return maze;
   }
 
-  function scanMaze(maze, start, end) {
-    debugger
+  function scanMaze(initialMaze, start, end) {
     let nodesInProcess = [end];
     let distance = 1;
+    initialMaze[end[0]][end[1]] = distance;
 
     while (nodesInProcess.length > 0) {
+      
+
       let newlyDiscvNodes = [];
       nodesInProcess.forEach(function(item) {
-        newlyDiscvNodes = checkNeighbors(maze, item);
-        
-        maze[item[0]][item[1]] = distance;
+        newlyDiscvNodes = newlyDiscvNodes.concat(checkNeighbors(initialMaze, item)); 
       });
-
-
+    
       nodesInProcess = removeDuplcDiscvNodes(newlyDiscvNodes);
+
+      
+
       // console.log(JSON.stringify(nodesInProcess));
 
       distance++;
+
+      nodesInProcess.forEach(function(item) {
+        initialMaze[item[0]][item[1]] = distance;
+      })
     }
 
-    return maze;
+    return initialMaze;
   }
 
-  function checkNeighbors(maze, node) {
+  function getNeighborsOf(node) {
+    let x = node[0];
+    let y = node[1];
+    result = [];
+
+    for (let x_offset = -1; x_offset <= 1; x_offset++) {
+      for (let y_offset = -1; y_offset <= 1; y_offset++) {
+          // offset (0, 0) is the cell itself, so ignore it
+          if (x_offset === 0 && y_offset === 0) continue;
+          if (x + x_offset >= 0 && x + x_offset < _ROWS
+             && y + y_offset >= 0 && y + y_offset < _COLS) {
+            result.push([x+x_offset, y+y_offset]);
+          }
+      }
+    }
+  
+    return result;
+  }
+
+  function checkNeighbors(initialMaze, node) {
     let discoveredNodes = [];
     let x = node[0];
     let y = node[1];
 
-    if (maze[x - 1][y] == 0) discoveredNodes.push(maze[x-1][y]);
-    if (maze[x][y - 1] == 0) discoveredNodes.push(maze[x][y - 1]);
-    if (maze[x + 1][y] == 0) discoveredNodes.push(maze[x + 1][y]);
-    if (maze[x][y + 1] == 0) discoveredNodes.push(maze[x][y + 1]);
+    for (let x_offset = -1; x_offset <= 1; x_offset++) {
+      for (let y_offset = -1; y_offset <= 1; y_offset++) {
+          // offset (0, 0) is the cell itself, so ignore it
+          // if (x_offset === 0 && y_offset === 0) continue;
+          if (x + x_offset >= 0 && x + x_offset < _ROWS
+             && y + y_offset >= 0 && y + y_offset < _COLS) {
+            if (initialMaze[x+x_offset][y+y_offset] === 0) discoveredNodes.push([x+x_offset, y+y_offset]);
+          }
+      }
+    }
   
     return discoveredNodes;
   }
 
   function removeDuplcDiscvNodes(nodes) {
     // console.log(nodes);
-    let list = [];
-    for (let i = 0; i < nodes.length; i++) {
-      let curr = nodes[i];
-      for (let j = 0; j < nodes.length; j++) {
-        if (curr !== nodes[j]) list.push(curr);
+    let result = [];
+    let obj = {};
+    nodes.forEach(function(item, index) {
+      if (!obj.hasOwnProperty(item.toString())) {
+        obj[item.toString()] = true;
+        result.push(item);
       }
+    });
+
+    return result;
+  }
+
+  function buildPath() {
+    // debugger;
+    let end = _END
+    let start = _START;
+    let currentStep = start;
+    let nodesInProcess = [];
+    let result = [];
+
+    while (currentStep.toString() != end.toString()) {
+      nodesInProcess = getNeighborsOf(currentStep);
+      nodesInProcess.forEach(function(item) {
+        if (getValueAt(item) < getValueAt(currentStep) && getValueAt(item) != -1) {
+          currentStep = item;
+        }
+      });
+
+      result.push(currentStep);
     }
 
-    return list;
+    console.log(JSON.stringify(result));
+
+    return result;
+  }
+
+  function getValueAt(node) {
+    let x = node[0];
+    let y = node[1];
+    return _SCANNED_MAZE[x][y];
   }
