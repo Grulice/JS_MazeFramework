@@ -103,18 +103,28 @@ function resetMaze() {
     },
     cells: [],
     walls: [],
+    path: [],
     startCell: null,
     endCell: null,
     drawPath: function (pathArray) {
+      this.clearPath();
       for (let step of pathArray) {
         let targetCell = this.cells[step[0]][step[1]];
         if (targetCell.cellType !== cellTypes.WALL) {
           targetCell.changeCellTypeTo(cellTypes.PATH);
+          this.path.push(targetCell);
         } else {
           console.error(
             `Can't draw path at ${step[0]}, ${step[1]} because it's a wall.`
           );
         }
+      }
+    },
+    clearPath: function () {
+      let shifted = this.path.shift();
+      while (shifted) {
+        shifted.changeCellTypeTo(cellTypes.EMPTY);
+        shifted = this.path.shift();
       }
     },
     drawWall: function (pos) {
@@ -259,7 +269,7 @@ function handleFindPath() {
 }
 
 function findPathUsingScript(fileName) {
-  if(!fileName) return;
+  if (!fileName) return;
   let worker = new Worker(`./algos/${fileName}`);
 
   worker.addEventListener("message", (e) => {
