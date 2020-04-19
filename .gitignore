@@ -1,2 +1,3 @@
 /algos/*
 !/algos/__stub.js
+!/algos/mrgd.js
