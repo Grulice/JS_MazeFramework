@@ -1,3 +1,7 @@
+/*
+ https://github.com/asadovkamran
+*/
+
 // worker eventlistener. Do not change this.
 //#region 
 self.addEventListener("message", (e) => {
