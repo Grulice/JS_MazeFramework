@@ -189,7 +189,7 @@ function addMouseListenersToCell(htmlCell) {
     if (e.buttons === 1) {
       if (e.shiftKey) {
         maze.drawStart(curpos);
-      } else if (e.ctrlKey) {
+      } else if (e.ctrlKey || e.metaKey) {
         maze.drawEnd(curpos);
       } else {
         maze.drawWall(curpos);
@@ -206,7 +206,7 @@ function addMouseListenersToCell(htmlCell) {
     const curpos = [this.mazeRow, this.mazeCol];
     if (e.shiftKey) {
       maze.drawStart(curpos);
-    } else if (e.ctrlKey) {
+    } else if (e.ctrlKey || e.metaKey) {
       maze.drawEnd(curpos);
     } else {
       maze.drawWall(curpos);
