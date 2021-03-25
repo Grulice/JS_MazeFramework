@@ -1,135 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="src/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-      rel="stylesheet"
-    />
-    <script src="src/index.js" defer></script>
-    <title>Maze framework</title>
-  </head>
-  <body>
-    <main class="maze-main">
-      <div class="maze-container">
-        <table id="maze-table"></table>
-      </div>
-      <ul class="controls-list">
-        <li>
-          <h3>Maze dimensions</h3>
-          <span>Rows:</span>
-          <input
-            type="number"
-            step="1"
-            id="input-dims-rows"
-            class="input-dim"
-            value="30"
-          />
-          <span>Cols:</span>
-          <input
-            type="number"
-            step="1"
-            id="input-dims-cols"
-            class="input-dim"
-            value="30"
-          />
-          <button class="main-button" id="draw-maze-button">Redraw Maze</button>
-        </li>
-        <li>
-          <h3>
-            Random maze (powered by
-            <a href="https://noopschallenge.com/challenges/mazebot">Mazebot</a
-            >):
-          </h3>
-          <p>
-            Min size:
-            <select name="" id="rand-size-select-min">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="40">40</option>
-              <option value="60">60</option>
-              <option value="100">100</option>
-              <option value="120">120</option>
-              <option value="150">150</option>
-              <option value="200">200</option>
-            </select>
-          </p>
-          <p>
-            Max size:
-            <select name="" id="rand-size-select-max">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="40">40</option>
-              <option value="60">60</option>
-              <option value="100">100</option>
-              <option value="120">120</option>
-              <option value="150">150</option>
-              <option value="200">200</option>
-            </select>
-          </p>
-          <button class="main-button" id="rand-get-maze">
-            Get a random maze!
-          </button>
-        </li>
-        <li>
-          <h3>Algorithm selection</h3>
-          <span class="algo-select-caption">Pathfinding algorithm: </span>
-          <select name="" id="algo-select" class="algo-select">
-            <!-- put your algorithms here -->
-            <!-- <option value="filename.js">Algorithm</option> -->
-            <option value="wave_propagation.js">Wave Propagation</option>
-            <option value="mrgd.js">MRGD</option>
-            <option value="astar.js">A*</option>
-          </select>
-          <button class="main-button" id="find-path-button">Find path</button>
-        </li>
-        <li>
-          <h3>Path info</h3>
-          <p id="error-label"></p>
-          <p>Path length: <span id="path-length"></span></p>
-          <p>Execution time: <span id="exec-time"></span></p>
-        </li>
-        <li>
-          <h3>Brush controls</h3>
-          <p>
-            Left-click to place
-            <span class="controls-info-text cell-wall">walls</span>
-          </p>
-          <p>Right-click to erase</p>
-          <p>
-            Shift+Left-click to place the
-            <span class="controls-info-text cell-start">start</span>
-          </p>
-          <p>
-            Ctrl(CMD)+Left-click to place the
-            <span class="controls-info-text cell-end">end</span>
-          </p>
-          <p>
-            Click "Find path" to find the
-            <span class="controls-info-text cell-path">path</span>
-          </p>
-          <p>Redraw maze to reset</p>
-        </li>
-        <li>
-          <h3><a href="howto.html">How to add your scripts</a></h3>
-        </li>
-      </ul>
-    </main>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="src/style.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <script src="src/index.js" defer></script>
+        <title>Maze framework</title>
+    </head>
+    <body>
+        <main class="maze-main">
+            <div class="maze-container">
+                <table id="maze-table"></table>
+            </div>
+            <ul class="controls-list">
+                <li>
+                    <h3>Maze dimensions</h3>
+                    <span>Rows:</span>
+                    <input
+                        type="number"
+                        step="1"
+                        id="input-dims-rows"
+                        class="input-dim"
+                        value="30"
+                    />
+                    <span>Cols:</span>
+                    <input
+                        type="number"
+                        step="1"
+                        id="input-dims-cols"
+                        class="input-dim"
+                        value="30"
+                    />
+                    <button class="main-button" id="draw-maze-button">
+                        Redraw Maze
+                    </button>
+                </li>
+                <li>
+                    <h3>
+                        Random maze (powered by
+                        <a href="https://noopschallenge.com/challenges/mazebot"
+                            >Mazebot</a
+                        >):
+                    </h3>
+                    <p>
+                        Min size:
+                        <select name="" id="rand-size-select-min">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                            <option value="60">60</option>
+                            <option value="100">100</option>
+                            <option value="120">120</option>
+                            <option value="150">150</option>
+                            <option value="200">200</option>
+                        </select>
+                    </p>
+                    <p>
+                        Max size:
+                        <select name="" id="rand-size-select-max">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                            <option value="60">60</option>
+                            <option value="100">100</option>
+                            <option value="120">120</option>
+                            <option value="150">150</option>
+                            <option value="200">200</option>
+                        </select>
+                    </p>
+                    <button class="main-button" id="rand-get-maze">
+                        Get a random maze!
+                    </button>
+                </li>
+                <li>
+                    <h3>Algorithm selection</h3>
+                    <span class="algo-select-caption"
+                        >Pathfinding algorithm:
+                    </span>
+                    <select name="" id="algo-select" class="algo-select">
+                        <!-- put your algorithms here -->
+                        <!-- <option value="filename.js">Algorithm</option> -->
+                        <option value="wave_propagation.js">
+                            Wave Propagation
+                        </option>
+                        <option value="mrgd.js">MRGD</option>
+                        <option value="astar.js">A*</option>
+                    </select>
+                    <button class="main-button" id="find-path-button">
+                        Find path
+                    </button>
+                </li>
+                <li>
+                    <h3>Path info</h3>
+                    <p id="error-label"></p>
+                    <p>Path length: <span id="path-length"></span></p>
+                    <p>Execution time: <span id="exec-time"></span></p>
+                </li>
+                <li>
+                    <h3>Brush controls</h3>
+                    <p>
+                        Left-click to place
+                        <span class="controls-info-text cell-wall">walls</span>
+                    </p>
+                    <p>Right-click to erase</p>
+                    <p>
+                        Shift+Left-click to place the
+                        <span class="controls-info-text cell-start">start</span>
+                    </p>
+                    <p>
+                        Ctrl(CMD)+Left-click to place the
+                        <span class="controls-info-text cell-end">end</span>
+                    </p>
+                    <p>
+                        Click "Find path" to find the
+                        <span class="controls-info-text cell-path">path</span>
+                    </p>
+                    <p>Redraw maze to reset</p>
+                </li>
+                <li>
+                    <h3><a href="howto.html">How to add your scripts</a></h3>
+                </li>
+            </ul>
+        </main>
 
-    <div id="loading-plaque" class="loading-plaque invisible">
-      <div class="lds-grid">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    </div>
-  </body>
+        <div id="loading-plaque" class="loading-plaque invisible">
+            <div class="lds-grid">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </body>
 </html>
