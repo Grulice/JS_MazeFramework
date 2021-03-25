@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const config = {
-    entry: "./src/index.js",
+    entry: "./src/index.ts",
     mode: process.env.WEBPACK_SERVE ? "development" : "production",
     devServer: {
         port: 8080,
@@ -29,6 +29,11 @@ const config = {
                 use: "babel-loader",
                 exclude: /node_modules/,
             },
+            {
+                test: /\.tsx?$/,
+                use: "ts-loader",
+                exclude: /node_modules/,
+            },
         ],
     },
     plugins: [
@@ -46,6 +51,9 @@ const config = {
         new MiniCssExtractPlugin(),
         new CleanWebpackPlugin(),
     ],
+    resolve: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+    },
     devtool: "eval-source-map",
 };
 

@@ -7,6 +7,15 @@ self.addEventListener("message", (e) => {
 
 // your code goes below this line
 // ----------------------------------------------------------
+/**
+ *
+ * @param {Object} mazeInfo JS object containing info about the maze
+ * @param {{rowNumber: number, colNumber: number}} mazeInfo.dimensions Number of rows and cols
+ * @param {[number, number]} mazeInfo.end The coordinates of the end (e.g. `[ 180, 79 ]`)
+ * @param {[number, number]} mazeInfo.start The coordinates of the start (e.g. `[ 180, 79 ]`)
+ * @param {[number, number][]} mazeInfo.walls Array of coordinates of the walls(e.g. `[[ 180, 79 ], [ 181, 79 ]]`)
+ * @returns {[number, number][]} Array of coordinates of the path (similar to the walls)
+ */
 function solve(mazeInfo) {
     // main solve function
     // ​

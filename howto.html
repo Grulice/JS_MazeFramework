@@ -18,23 +18,13 @@
                     <code>/src/algos/scripts</code> directory and rename it.
                 </li>
                 <li>
-                    In the <code>/src/algos/index.js</code>, copy/paste one of
-                    the existing entries. Change object key, path to the
-                    algorithm script and <code>displayName</code> to suit your
-                    algorithm. It should look something like this:
-                    <pre>
-                        <code>
-algo_name: {
-    worker: new Worker(new URL("./scripts/algo_name.js", import.meta.url)),
-    displayName: "My algorithm's name",
-},
-                        </code>
-                    </pre>
-
-                    Unfortunately, due to how webpack imports webworkers - the
-                    paths to scripts must be written out at build-time and we
-                    can't map algorithm names to paths at run-time. If you know
-                    how to solve this problem - be sure to submit a PR :).
+                    In the <code>/src/algos/index.ts</code>, copy/paste one of
+                    the existing entries and change the values to suit your
+                    algorithm. Unfortunately, due to how webpack imports
+                    webworkers - the paths to scripts must be written out at
+                    build-time and we can't map algorithm names to paths at
+                    run-time. If you know how to solve this problem - be sure to
+                    submit a PR :).
                 </li>
             </ol>
             <h3 class="faq-title">
