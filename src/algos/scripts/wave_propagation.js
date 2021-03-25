@@ -6,7 +6,6 @@
 //#region
 self.addEventListener("message", (e) => {
     self.postMessage(solve(e.data));
-    self.close();
 });
 //#endregion
 

@@ -3,22 +3,44 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="src/style.css" />
         <link
             href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
             rel="stylesheet"
         />
-        <script src="src/index.js" defer></script>
         <title>Maze framework - How to add your own scripts</title>
     </head>
     <body>
         <main class="howto-main">
-            <h1>Where do I add my own scripts?</h1>
-            <p>Your .js files go in the <i>/algos/</i> directory.</p>
-            <h1>
+            <h3 class="faq-title">How do I add my own scripts?</h3>
+            <ol>
+                <li>
+                    Duplicate the <code>__stub.js</code> file inside the
+                    <code>/src/algos/scripts</code> directory and rename it.
+                </li>
+                <li>
+                    In the <code>/src/algos/index.js</code>, copy/paste one of
+                    the existing entries. Change object key, path to the
+                    algorithm script and <code>displayName</code> to suit your
+                    algorithm. It should look something like this:
+                    <pre>
+                        <code>
+algo_name: {
+    worker: new Worker(new URL("./scripts/algo_name.js", import.meta.url)),
+    displayName: "My algorithm's name",
+},
+                        </code>
+                    </pre>
+
+                    Unfortunately, due to how webpack imports webworkers - the
+                    paths to scripts must be written out at build-time and we
+                    can't map algorithm names to paths at run-time. If you know
+                    how to solve this problem - be sure to submit a PR :).
+                </li>
+            </ol>
+            <h3 class="faq-title">
                 What information does the framework provide? What is the script
                 expected to return?
-            </h1>
+            </h3>
             <p>
                 The framework provides the maze dimensions, start and end
                 position coordinates and an array with coordinates of the walls.
@@ -28,51 +50,24 @@
                 column], which will be drawn as the path in the maze.
             </p>
             <p>
-                There's a <i>__stub.js</i> file in the <i>/algos/</i> folder.
-                Copy it for your own script and use it as a guide for what your
-                script accepts and returns.
+                There's a <code>__stub.js</code> file in the
+                <code>/src/algos/scripts</code> folder. Copy it for your own
+                script and use it as a guide for what your script accepts and
+                returns.
             </p>
             <p>
                 There's also a sample algorithm (mrgd.js) written by
                 <a href="https://github.com/mr9d/">Aleksandr Kozlov</a>.
             </p>
-            <h1>
-                How do I make my scripts appear in the pathfinding algorithms
-                menu?
-            </h1>
-            <p>
-                Currently, you have to add your script files in the index.html
-                as an option for the select.algo-select.
-            </p>
-            <p>
-                Your options should look like
-                <code
-                    >&ltoption value="filename.js">Algorithm
-                    name&lt/option></code
-                >
-            </p>
-            <p>
-                Don't add the file path, just the file name of your script in
-                the <i>/algos/</i> folder
-            </p>
-            <h1>
-                I think my script is going to take a really long time to
-                execute. Will this hang the tab?
-            </h1>
-            <p>
-                Scripts are executed on a separate thread, using webworkers.
-                Your tab should be fine :)
-            </p>
-            <h1>
+            <h3 class="faq-title">
                 I'm getting a security error when I try initiating pathfinding.
-            </h1>
+            </h3>
             <p>
                 You can't load web workers when running scripts from a local
-                file. Open the page through a web-server (like the "Live Server"
-                plugin for VS Code).
+                file. Serve the page through a web-server (like the "Live
+                Server" plugin for VS Code).
             </p>
-            <hr />
-            <h1>Attributions</h1>
+            <h3 class="faq-title">Attributions</h3>
             <p>
                 Framework by Javid Bunyadzade. Contact me at
                 <a href="mailto:j.bunyadzade@gmail.com"
@@ -95,7 +90,7 @@
             </p>
         </main>
         <div class="back-container">
-            <a href="index.html"><< Back</a>
+            <a href="index.html">&lt;&lt; Back</a>
         </div>
     </body>
 </html>
