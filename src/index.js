@@ -1,25 +1,17 @@
-const cellTypes = {
-    EMPTY: 0,
-    WALL: 1,
-    START: 2,
-    END: 3,
-    PATH: 4,
-};
+import "./style.css";
 
-const cellTypeStyles = {
-    0: "cell-empty", // empty
-    1: "cell-wall", // wall
-    2: "cell-start", // start
-    3: "cell-end", // end
-    4: "cell-path", // path
-};
+import {
+    addMouseListenersToCell,
+    getCellDimensions,
+    removeAllChildren,
+} from "./utils";
+import { workers } from "./algos";
+import { CELL_TYPES, CELL_TYPE_STYLES, RANDOM_MAZE_API_BASEURL } from "./consts";
 
-const RANDOM_MAZE_API_BASEURL = "https://api.noopschallenge.com/mazebot/";
-
-HTMLTableCellElement.prototype.cellType = cellTypes.EMPTY;
+HTMLTableCellElement.prototype.cellType = CELL_TYPES.EMPTY;
 HTMLTableCellElement.prototype.changeCellTypeTo = function (newType) {
     this.cellType = newType;
-    this.className = cellTypeStyles[this.cellType];
+    this.className = CELL_TYPE_STYLES[this.cellType];
 };
 HTMLTableCellElement.prototype.mazeRow = 0;
 HTMLTableCellElement.prototype.mazeCol = 0;
@@ -61,6 +53,15 @@ dimensionElems.goButton.addEventListener("click", handleCreateMaze);
 let maze;
 
 handleCreateMaze();
+
+Object.entries(workers).forEach((entry) => {
+    const [key, workerInfo] = entry;
+    const workerOption = document.createElement("option");
+    workerOption.value = key;
+    workerOption.innerText = workerInfo.displayName;
+    algoSelectElems.algoSelect.append(workerOption);
+});
+
 function handleCreateMaze() {
     let rowsNum = Number(dimensionElems.rowInput.value);
     let colsNum = Number(dimensionElems.colInput.value);
@@ -88,7 +89,7 @@ function createMaze(rowsNum, colsNum) {
             curCell.style.height = cellDims + "px";
             curCell.style.width = cellDims + "px";
 
-            addMouseListenersToCell(curCell);
+            addMouseListenersToCell(curCell, maze);
             curRow.push(curCell);
         }
         maze.cells.push(curRow);
@@ -110,8 +111,8 @@ function resetMaze() {
             this.clearPath();
             for (let step of pathArray) {
                 let targetCell = this.cells[step[0]][step[1]];
-                if (targetCell.cellType === cellTypes.EMPTY) {
-                    targetCell.changeCellTypeTo(cellTypes.PATH);
+                if (targetCell.cellType === CELL_TYPES.EMPTY) {
+                    targetCell.changeCellTypeTo(CELL_TYPES.PATH);
                     this.path.push(targetCell);
                 } else {
                     console.warn(
@@ -123,19 +124,19 @@ function resetMaze() {
         clearPath: function () {
             let shifted = this.path.shift();
             while (shifted) {
-                shifted.changeCellTypeTo(cellTypes.EMPTY);
+                shifted.changeCellTypeTo(CELL_TYPES.EMPTY);
                 shifted = this.path.shift();
             }
         },
         drawWall: function (pos) {
             let targetCell = this.cells[pos[0]][pos[1]];
-            if (targetCell.cellType === cellTypes.START) {
+            if (targetCell.cellType === CELL_TYPES.START) {
                 this.startCell = null;
             }
-            if (targetCell.cellType === cellTypes.END) {
+            if (targetCell.cellType === CELL_TYPES.END) {
                 this.endCell = null;
             }
-            if (targetCell.cellType === cellTypes.PATH) {
+            if (targetCell.cellType === CELL_TYPES.PATH) {
                 this.path = this.path.filter(
                     (pathCell) =>
                         !(
@@ -144,36 +145,36 @@ function resetMaze() {
                         )
                 );
             }
-            targetCell.changeCellTypeTo(cellTypes.WALL);
+            targetCell.changeCellTypeTo(CELL_TYPES.WALL);
             this.walls.push([targetCell.mazeRow, targetCell.mazeCol]);
         },
         drawStart: function (pos) {
             let targetCell = this.cells[pos[0]][pos[1]];
             if (this.startCell) {
-                this.startCell.changeCellTypeTo(cellTypes.EMPTY);
+                this.startCell.changeCellTypeTo(CELL_TYPES.EMPTY);
             }
             if (targetCell !== null)
-                targetCell.changeCellTypeTo(cellTypes.START);
+                targetCell.changeCellTypeTo(CELL_TYPES.START);
             this.startCell = targetCell;
         },
         drawEnd: function (pos) {
             let targetCell = this.cells[pos[0]][pos[1]];
             if (this.endCell) {
-                this.endCell.changeCellTypeTo(cellTypes.EMPTY);
+                this.endCell.changeCellTypeTo(CELL_TYPES.EMPTY);
             }
-            if (targetCell !== null) targetCell.changeCellTypeTo(cellTypes.END);
+            if (targetCell !== null) targetCell.changeCellTypeTo(CELL_TYPES.END);
             this.endCell = targetCell;
         },
         eraseCell: function (pos) {
             let targetCell = this.cells[pos[0]][pos[1]];
-            if (targetCell.cellType !== cellTypes.EMPTY) {
-                if (targetCell.cellType === cellTypes.START) {
+            if (targetCell.cellType !== CELL_TYPES.EMPTY) {
+                if (targetCell.cellType === CELL_TYPES.START) {
                     this.startCell = null;
                 }
-                if (targetCell.cellType === cellTypes.END) {
+                if (targetCell.cellType === CELL_TYPES.END) {
                     this.endCell = null;
                 }
-                targetCell.changeCellTypeTo(cellTypes.EMPTY);
+                targetCell.changeCellTypeTo(CELL_TYPES.EMPTY);
                 maze.walls = maze.walls.filter(
                     (cell) =>
                         !(
@@ -184,54 +185,6 @@ function resetMaze() {
             }
         },
     };
-}
-
-function addMouseListenersToCell(htmlCell) {
-    // press-drag listeners
-    htmlCell.addEventListener("mouseover", function (e) {
-        e.preventDefault();
-        const curpos = [this.mazeRow, this.mazeCol];
-        if (e.buttons === 1) {
-            if (e.shiftKey) {
-                maze.drawStart(curpos);
-            } else if (e.ctrlKey || e.metaKey) {
-                maze.drawEnd(curpos);
-            } else {
-                maze.drawWall(curpos);
-            }
-        } else if (e.buttons === 2) {
-            maze.eraseCell(curpos);
-        }
-    });
-
-    // For some reason, single clicks over cells are not handled by events above,
-    // so we have to write them out separately
-    htmlCell.addEventListener("click", function (e) {
-        e.preventDefault();
-        const curpos = [this.mazeRow, this.mazeCol];
-        if (e.shiftKey) {
-            maze.drawStart(curpos);
-        } else if (e.ctrlKey || e.metaKey) {
-            maze.drawEnd(curpos);
-        } else {
-            maze.drawWall(curpos);
-        }
-    });
-    htmlCell.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
-        const curpos = [this.mazeRow, this.mazeCol];
-        maze.eraseCell(curpos);
-    });
-}
-
-function getCellDimensions(colsNum) {
-    return (window.innerHeight - 25) / colsNum;
-}
-
-function removeAllChildren(element) {
-    while (element.firstChild) {
-        element.removeChild(element.firstChild);
-    }
 }
 
 //#region random maze logic
@@ -282,9 +235,9 @@ function handleFindPath() {
     findPathUsingScript(algoSelectElems.algoSelect.value);
 }
 
-function findPathUsingScript(fileName) {
-    if (!fileName) return;
-    let worker = new Worker(`./algos/${fileName}`);
+function findPathUsingScript(workerKey) {
+    if (!workerKey) return;
+    let worker = workers[workerKey].worker;
 
     worker.addEventListener("message", (e) => {
         if (e.data.length > 0) {
