@@ -1,3 +1,5 @@
+// for async/await support
+import "regenerator-runtime/runtime.js";
 import "./style.css";
 
 import {
@@ -6,7 +8,11 @@ import {
     removeAllChildren,
 } from "./utils";
 import { workers } from "./algos";
-import { CELL_TYPES, CELL_TYPE_STYLES, RANDOM_MAZE_API_BASEURL } from "./consts";
+import {
+    CELL_TYPES,
+    CELL_TYPE_STYLES,
+    RANDOM_MAZE_API_BASEURL,
+} from "./consts";
 
 HTMLTableCellElement.prototype.cellType = CELL_TYPES.EMPTY;
 HTMLTableCellElement.prototype.changeCellTypeTo = function (newType) {
@@ -162,7 +168,8 @@ function resetMaze() {
             if (this.endCell) {
                 this.endCell.changeCellTypeTo(CELL_TYPES.EMPTY);
             }
-            if (targetCell !== null) targetCell.changeCellTypeTo(CELL_TYPES.END);
+            if (targetCell !== null)
+                targetCell.changeCellTypeTo(CELL_TYPES.END);
             this.endCell = targetCell;
         },
         eraseCell: function (pos) {
@@ -200,10 +207,16 @@ function handleRandomMaze() {
 
 async function drawRandomMaze(minSize, maxSize) {
     loadingPlaque.classList.remove("invisible");
-    let APIresponse = fetch(
-        RANDOM_MAZE_API_BASEURL +
-            `random?minSize=${minSize.toString()}&maxSize=${maxSize.toString()}`
-    );
+    let APIresponse;
+    try {
+        APIresponse = fetch(
+            RANDOM_MAZE_API_BASEURL +
+                `random?minSize=${minSize.toString()}&maxSize=${maxSize.toString()}`
+        );
+    } catch (error) {
+        alert(error);
+        loadingPlaque.classList.add("invisible");
+    }
     let unparsed = await APIresponse;
     let parsed = await unparsed.json();
 
