@@ -53,8 +53,8 @@ export class Maze {
         });
         this.walls = [];
         this.path = [];
-        this.eraseCell(this.startCell);
-        this.eraseCell(this.endCell);
+        this.startCell  && this.eraseCell(this.startCell);
+        this.endCell && this.eraseCell(this.endCell);
     }
 
     public solveUsing(algoName: string): Promise<IBenchmarkResults> {
