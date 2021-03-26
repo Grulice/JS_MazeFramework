@@ -25,12 +25,19 @@ randomMazeElems.goButton.addEventListener("click", handleRandomMaze);
 
 let maze: Maze;
 
+mainMazeTbl.addEventListener("mouseleave", () => maze.resetDrawingPoints());
+mainMazeTbl.addEventListener("mouseup", () => maze.resetDrawingPoints());
+
 handleCreateMaze();
 
 function handleCreateMaze() {
     let rowsNum = Number(dimensionElems.rowInput.value);
     let colsNum = Number(dimensionElems.colInput.value);
-    maze = new Maze(rowsNum, colsNum, mainMazeTbl);
+    if (maze && rowsNum === maze.rows && colsNum === maze.cols) {
+        maze.softReset();
+    } else {
+        maze = new Maze(rowsNum, colsNum, mainMazeTbl);
+    }
 }
 
 function handleRandomMaze() {

@@ -47,6 +47,16 @@ export class Maze {
         }
     }
 
+    public softReset() {
+        [...this.walls, ...this.path].forEach((cell) => {
+            cell.type = ECellType.EMPTY;
+        });
+        this.walls = [];
+        this.path = [];
+        this.eraseCell(this.startCell);
+        this.eraseCell(this.endCell);
+    }
+
     public solveUsing(algoName: string): Promise<IBenchmarkResults> {
         let execStartTime = Date.now();
         return new Promise((resolve, reject) => {
@@ -85,49 +95,46 @@ export class Maze {
     }
 
     public generateRandom() {
-        this.map.forEach((row) =>
-            row.forEach((cell) => {
-                this.eraseCell(cell);
-                if (random(0, 2) === 0) {
-                    this.setWall(cell);
-                }
-            })
-        );
+        this.softReset();
+        for (let i = 0; i < Math.round((this.rows * this.cols) / 3); i++) {
+            const randRow = random(this.rows - 1);
+            const randCol = random(this.cols - 1);
+            const target = this.map[randRow][randCol];
+            this.setWall(target);
+        }
     }
 
     private addMouseListenersToCell(cell: MazeCell) {
-        // press-drag listeners
-        const { setStart, setEnd, setWall, eraseCell } = this;
-        cell.HTMLCell.addEventListener("mouseover", function (e) {
+        cell.HTMLCell.addEventListener("mouseenter", (e) => {
             e.preventDefault();
             if (e.buttons === 1) {
                 if (e.shiftKey) {
-                    setStart(cell);
+                    this.setStart(cell);
                 } else if (e.ctrlKey || e.metaKey) {
-                    setEnd(cell);
+                    this.setEnd(cell);
                 } else {
-                    setWall(cell);
+                    this.handleDrawLine(cell, ECellType.WALL);
                 }
             } else if (e.buttons === 2) {
-                eraseCell(cell);
+                this.handleDrawLine(cell, ECellType.EMPTY);
             }
         });
 
         // For some reason, single clicks over cells are not handled by events above,
         // so we have to write them out separately
-        cell.HTMLCell.addEventListener("click", function (e) {
+        cell.HTMLCell.addEventListener("mousedown", (e) => {
             e.preventDefault();
             if (e.shiftKey) {
-                setStart(cell);
+                this.setStart(cell);
             } else if (e.ctrlKey || e.metaKey) {
-                setEnd(cell);
+                this.setEnd(cell);
             } else {
-                setWall(cell);
+                this.setWall(cell);
             }
         });
-        cell.HTMLCell.addEventListener("contextmenu", function (e) {
+        cell.HTMLCell.addEventListener("contextmenu", (e) => {
             e.preventDefault();
-            eraseCell(cell);
+            this.eraseCell(cell);
         });
     }
 
@@ -202,6 +209,70 @@ export class Maze {
                 shifted.type = ECellType.EMPTY;
             }
             shifted = this.path.shift();
+        }
+    };
+
+    private drawingPoints: TPosition[] = [];
+    private handleDrawLine = (cell: MazeCell, type: ECellType) => {
+        const curPoint: TPosition = [cell.position.row, cell.position.col];
+        this.drawingPoints.push(curPoint);
+        if (this.drawingPoints.length > 1) {
+            const a = this.drawingPoints.shift();
+            const b = this.drawingPoints[0];
+            this.drawLine(a, b, type);
+        }
+    };
+
+    public resetDrawingPoints = () => {
+        this.drawingPoints = [];
+    };
+
+    /**
+     * Interpolates and draws a line of cells between two points on the grid
+     * @param a starting point position
+     * @param b ending point position
+     * @param cellType the cell type that the line will be painted with
+     */
+    private drawLine = (a: TPosition, b: TPosition, cellType: ECellType) => {
+        const { max, abs, round } = Math;
+        const offsetRow = b[0] - a[0];
+        const offsetCol = b[1] - a[1];
+
+        const delta = max(abs(offsetRow), abs(offsetCol));
+        const deltaRow = offsetRow / delta;
+        const deltaCol = offsetCol / delta;
+
+        let curRow = a[0];
+        let curCol = a[1];
+        let roundedRow = round(curRow);
+        let roundedCol = round(curCol);
+        do {
+            this.setCell(this.map[roundedRow][roundedCol], cellType);
+            curRow += deltaRow;
+            curCol += deltaCol;
+            roundedRow = round(curRow);
+            roundedCol = round(curCol);
+        } while (roundedRow !== b[0] || roundedCol !== b[1]);
+
+        this.setCell(this.map[b[0]][b[1]], cellType);
+    };
+
+    private setCell = (cell: MazeCell, type: ECellType) => {
+        switch (type) {
+            case ECellType.WALL:
+                this.setWall(cell);
+                break;
+            case ECellType.EMPTY:
+                this.eraseCell(cell);
+                break;
+            case ECellType.START:
+                this.setStart(cell);
+                break;
+            case ECellType.END:
+                this.setEnd(cell);
+                break;
+            default:
+                break;
         }
     };
 }
