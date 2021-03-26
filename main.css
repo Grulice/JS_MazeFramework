@@ -46,7 +46,9 @@ p {
 }
 
 .controls-list {
-    /* width: 20%; */
+    width: 20%;
+    margin-left: 20px;
+    min-width: 303px;
     list-style-type: none;
 }
 h1,
@@ -64,10 +66,24 @@ h3 {
 .controls-info-text {
     display: inline-block;
     color: white;
+    padding: 2px;
 }
 
 .input-dim {
     width: 50px;
+}
+
+.algo-select-controls {
+    display: flex;
+    width: 100%;
+}
+
+.algo-select {
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-left: 5px;
 }
 
 .main-button {
